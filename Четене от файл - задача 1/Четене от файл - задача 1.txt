@@ -1,0 +1,175 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+class Person{
+protected:
+	virtual ostream & doprint(ostream & out) const{
+		return out << first_name << " " << last_name << endl;
+	};
+	string first_name;
+	string last_name;
+public:
+	Person(){};
+	Person(string first_name, string last_name) : first_name(first_name), last_name(last_name){};
+	string get_first(){ //  член-функции за достъп до данните
+		return first_name;
+	}
+	string get_last(){ //  член-функции за достъп до данните
+		return last_name;
+	}
+	virtual void read(ifstream & inp_data){ // член-функция read за четене от файл на данните с параметър файлова променлива 
+			inp_data >> first_name;
+			inp_data >> last_name;
+
+
+		inp_data.close();
+		
+	}
+	virtual void write(ofstream & output){  // член-функция write за писане на файл на данните с параметър файлова променлива 
+		output << first_name << " " << last_name;
+		}
+	virtual void set_first(string first){
+		first_name = first;
+	}
+	virtual void set_last(string first){
+		last_name = first;
+	}
+	virtual string get_position(){
+		return 0;
+	};
+	virtual int get_salary(){
+		return 0;
+	}; 
+
+	friend ostream & operator <<(ostream & out, const Person & b){ // Правим си една виртуална функция doprint която като се извика оператора << да се извика правилната функция (тъй като предефинирания оператор << в наследника не работи)
+		return b.doprint(out);
+	};
+	
+};
+class Worker : public Person{
+private:
+	ostream & doprint(ostream & out) const {
+		return out << first_name << " " << last_name << " " << salary << " " << position<< endl;
+	}
+	int salary;
+	string position;
+public:
+	Worker(){};
+	Worker(int salary, string position) : salary(salary), position(position){};
+	 int get_salary(){  //  член-функции за достъп до данните
+		return salary;
+	};
+	void set_first(string first){
+		first_name = first;
+	}
+	void set_last(string first){
+		last_name = first;
+	}
+	 string get_position(){  //  член-функции за достъп до данните
+		return position;
+	};
+
+
+	 void read(ifstream & inp_data){ // член-функция read за четене от файл на данните с параметър файлова променлива 
+		inp_data >> first_name;
+		inp_data >> last_name;
+		inp_data >> salary;
+		inp_data >> position;
+
+
+		inp_data.close();
+
+	}
+	 void write(ofstream & out){  // член-функция write за писане на файл на данните с параметър файлова променлива 
+		out << first_name << " " << last_name << " " << salary << " " << position;
+	}
+};
+
+vector<Person *> LoadPeople(ifstream & people, ifstream & workers){
+	vector<Person *> result;
+	string first, last;
+	while (people.good()){
+		people >> first;
+		people >> last;
+		Person * newperson = new Person(first, last);
+		result.push_back(newperson);
+	}
+	int balance;
+	string number;
+	while (workers.good()){
+		workers >> first >> last >> balance >> number;
+		Worker * newworker = new Worker(balance, number);
+		newworker->set_first(first);
+		newworker->set_last(last);
+		result.push_back(newworker);
+	}
+	people.close();
+	workers.close();
+	return result;
+}
+
+void OutPut(vector<Person *> vec){
+	ofstream output("output.txt");
+	for (int i = 0; i < vec.size(); i++)
+		output << *vec[i];
+}
+
+
+int main()
+{
+	                    // - PERSON
+	string person, students, output, person_input;
+	person_input = "personin.txt"; //  personin.txt съдържа - Ivan Stanev
+	Person ivan;
+	ifstream inp_data;
+	inp_data.open(person_input.c_str());
+	ivan.read(inp_data); // четене на данни от файл с параметър файлова променлива(ifstream)
+
+	cout << ivan.get_first() << " " << ivan.get_last() << endl; // член-функции за данните
+
+	ofstream fout("personout.txt");
+	ivan.write(fout); // писане на данните във файл с параметър файлова променлива(ofstream)
+
+
+
+	                  // - WORKER 
+		Worker peter;
+	string worker_input, worker_output;
+	worker_input = "workerin.txt"; // workerin.txt съдържа - Ivan Stanev 45353 AA
+	ifstream worker_inp;
+
+	worker_inp.open(worker_input.c_str());
+	peter.read(worker_inp); // четене на данни от файл с параметър файлова променлива(ifstream)
+	
+	cout << peter.get_first() << " " << peter.get_last() << " " << peter.get_salary() << " " << peter.get_position() << endl;  // член-функции за данните
+	
+	ofstream f_out("workerout.txt");
+	peter.write(f_out); // писане на данните във файл с параметър файлова променлива(ofstream)
+
+	                  // ЧЕТЕНЕ ОТ ДВА ФАЙЛА, ЗАРЕЖДАНЕ ВЪВ ВЕКТОР, СОРТИРАНЕ И ИЗВАЖДАНЕ В НОВ ФАЙЛ
+	
+	ifstream people("PEOPLE.txt"), workers("WORKERS.txt");
+	vector<Person *> everyone;
+	everyone = LoadPeople(people, workers); // зареждаме полиморфно всички Работници и Хора във вектор с указатели към Person(както е условието)
+	cout << everyone[1]->get_first() << " " << everyone[1]->get_last() << endl; // тест
+	cout << everyone[6]->get_first() << " " << everyone[6]->get_last() << " " << everyone[6]->get_salary() << " " << everyone[6]->get_position() << endl; // тест че всичко работи
+
+	for (int i = 0; i < everyone.size(); i++){ // СОРТИРАМЕ ПО ФАМИЛИИ
+		for (int j = i + 1; j < 7; j++){
+			if (everyone[i]->get_last() > everyone[j]->get_last()){
+				swap(everyone[i], everyone[j]);
+			}
+		}
+	}
+	for (int i = 0; i < 7; i++)
+		cout << everyone[i]->get_last() << endl; // тест че е сортиран вектора по фамилии
+
+	OutPut(everyone);
+
+	
+	return 0;
+}
