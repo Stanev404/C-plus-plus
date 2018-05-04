@@ -8,7 +8,7 @@ class ArrayIterator;
 template<typename T>
 class Array {
 private:
-	int size1; // ÇÀĞÀÄÈ SIZE() âúâ print2
+	int size1; // Ã‡Ã€ÃÃ€Ã„Ãˆ SIZE() Ã¢ÃºÃ¢ print2
 	T * ptr;
 public:
 	typedef ArrayIterator<T> iterator;
@@ -35,13 +35,13 @@ public:
 	T& operator[](int pos){
 		return ptr[pos];
 	}
-	iterator begin(){ // ÒÓÊ ÂĞÚÇÂÀÌÅ ÌÀÑÈÂÀ ÊÚÌ ÈÒÅĞÀÒÎĞÀ
+	iterator begin(){ // Ã’Ã“ÃŠ Ã‚ÃÃšÃ‡Ã‚Ã€ÃŒÃ… ÃŒÃ€Ã‘ÃˆÃ‚Ã€ ÃŠÃšÃŒ ÃˆÃ’Ã…ÃÃ€Ã’ÃÃÃ€
 		T * nov = new T;
 		nov = ptr;
 		*nov = *nov + 1000;
 		return iterator(0, nov);
 	}
-	iterator end(){ // äà ñå âúğòè äîêàòî íå ñòèãíå êğàÿ
+	iterator end(){ // Ã¤Ã  Ã±Ã¥ Ã¢ÃºÃ°Ã²Ã¨ Ã¤Ã®ÃªÃ Ã²Ã® Ã­Ã¥ Ã±Ã²Ã¨Ã£Ã­Ã¥ ÃªÃ°Ã Ã¿
 		return iterator(size1, nullptr);
 	}
 	int size(){
